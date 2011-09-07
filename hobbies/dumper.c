@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#define BLOCK 16
+
 void dump(const void *data, const uint len)
 {
     static int n = 0;
     const unsigned  const char *c = (unsigned char*) data;
-    unsigned int i;
+    int i;
     for( i = 0; i<len;i++ ) {
-        printf("%02d ",c[i]);
+        printf("%02x ",c[i]);
         n++;
         if ( (n % 16 ) == 0 )
             putchar('\n');
@@ -17,7 +19,7 @@ void dump(const void *data, const uint len)
 
 int main(int argc, char** argv)
 {
-    unsigned char byte = 0;
+    unsigned char bytes[BLOCK] = {0};
 	FILE *pfile = NULL;
 
 	if ( argc > 1 )
@@ -27,14 +29,18 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-
 	if ( errno ) {
 		printf("Error on file: %d.\nWhat kind of file is this?!\n",errno);
 		return -2;
 	}
 
-    while ( (fread(&byte, sizeof(char), 1, pfile)) != 0 )
-		dump(&byte,1);
+    while ( (fread(bytes, sizeof(char), BLOCK, pfile)) != 0 ) {
+        dump(bytes,BLOCK);
+        /* clean the buffer */
+        memset(bytes,0,BLOCK);
+    }
+
+    putchar('\n');
 
     fclose(pfile);
     return 0;
