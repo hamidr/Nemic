@@ -9,7 +9,7 @@
 
 
 
-#define NumberOfProcess 10
+#define NumberOfProcess 5
 
 int main()
 {
