@@ -3,5 +3,13 @@
 #include <sys/wait.h>
 #include "base.h"
 
-#define RELEASE(x) if(x) delete x; x = NULL;
+template <typename T>
+void release(T *x)
+{
+	if(x)
+		delete x;
+
+	x = NULL;
+}
+
 

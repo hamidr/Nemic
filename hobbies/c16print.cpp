@@ -14,9 +14,9 @@ int main()
 {
     char16_t v[]=u"Hello World\n";
     for_each( v, v+(sizeof(v)/sizeof(char16_t)), [](char16_t &x)  
-                                                                {
-                                                                    cout << (char)x;
-                                                                });
+                                                 {
+                                                     cout << (char)x;
+                                                 });
 
     return 0;
 }
