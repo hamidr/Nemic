@@ -42,7 +42,7 @@ int main()
 		case 3:
 			b = new derived4;
 			break;
-
+			
 		case 4:
 			b = new derived5;
 			break;
