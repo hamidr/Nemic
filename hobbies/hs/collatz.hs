@@ -29,18 +29,19 @@ collatz n
 
 collatzSeq :: Integral a => a -> [a]
 collatzSeq n 
-	| n > 1 = let b = collatz n in b : collatzSeq b
+	| n > 1 = let b = collatz n 
+		in b : collatzSeq b
 	| otherwise = []
 
 catchBugs :: [String] -> Bool
 catchBugs ( str:[] ) = all isNumber str
 catchBugs _ = False
 
-main = do
-		args <- getArgs
-		if ( catchBugs args )
-			then 
-				let number = read ( args !! 0 ) :: Int
-				in putStrLn $ show $ collatzSeq number
-			else putStrLn "what?"
-
+main = do 
+	args <- getArgs
+	if ( catchBugs args )
+		then 
+			let number = read ( args !! 0 ) :: Int
+			in putStrLn $ show $ collatzSeq number
+		else putStrLn "what?"
+	
