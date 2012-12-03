@@ -1,85 +1,141 @@
-
-#include <list>
 #include <ostream>
+#include <memory>
 
-using std::list;
 using std::ostream;
+using std::unique_ptr;
 
+// Binary Tree
 template < typename T >
 class Node
 {
 public:
-	Node( Node<T> *parent, T *value );
-	inline ~Node();
+    Node();
+    Node(Node<T> &) = delete;
 
-	inline Node<T> *parent() const;
-	inline T &operator*() const;
-	inline void setParent(Node<T> *parent);
-	
-	void setValue(T *ptr);
-	void clearValue();
+    inline Node(const T &val, const Node<T> *parent = nullptr );
 
-	//friend ostream & operator<<( ostream &o, Node<T> &n);
-	//{ o << *n.m_value; return o; }
+    inline ~Node();
+
+    inline Node<T> *parent() const
+    { return m_parent; }
+
+    inline Node<T> *leftNode() const
+    { return m_left; }
+
+    inline Node<T> *rightNode() const
+    { return m_right; }
+
+    bool isRoot() const
+    { return (bool) m_parent; }
+
+    inline const T &data() const
+    { return *m_data; }
+
+    inline bool hasData() const
+    { return (bool) m_data; }
+
+    Node<T> *insertNode(const T &val);
+
+    void freeBranch();
+
+    static int c;
 
 private:
-	T *m_value;
-	Node<T> *m_parent;
-	list< Node<T>* > m_nodes;
-};
+    void clearNode();
 
+private:
+    unique_ptr<T> m_data;
+
+    const Node<T> * m_parent = nullptr;
+    Node<T> * m_left  = nullptr;
+    Node<T> * m_right = nullptr;
+};
+template<typename T>
+int Node<T>::c = 0;
+
+//Constructor: Intialiases node
 template<typename T> inline 
-Node<T>::Node( Node<T> *parent, T *value )
-	: m_parent(parent), m_value(value)
+Node<T>::Node( const T &val, const Node<T> *parent )
+    : m_data(new T(val)), m_parent(parent)
 {}
 
 
+//Destructor
 template<typename T> inline 
 Node<T>::~Node()
-{ clearValue(); }
+{ freeBranch(); }
 
 
-template<typename T> inline
-T &Node<T>::operator*() const
-{ return *m_value; }
-
-
-template<typename T> inline
-Node<T> *Node<T>::parent() const
-{ return parent; }
-
-
-template<typename T>
-void Node<T>::setValue(T *ptr)
+//cleans the inside of the node
+template<typename T> 
+void Node<T>::clearNode()
 { 
-	clearValue();
-	m_value = ptr;
+    m_data.reset();
+    m_left = m_right = nullptr;
 }
 
 
-template<typename T> inline
-void Node<T>::setParent(Node<T> *parent)
-{ m_parent = parent; }
+template<typename T>
+Node<T> *Node<T>::insertNode(const T &val)
+{
+    Node<T> *res;
+
+    if ( !m_data || val == data() ) {
+        m_data.reset( new T(val) );
+        res = this;
+    }
+    else if ( val > data() ) {
+        res = m_right ?
+                    m_right->insertNode(val)
+                  : m_right = new Node(val, this);
+    }
+    else // if ( val <= data())
+        res = m_left ?
+                    m_left->insertNode(val)
+                  : m_left = new Node(val, this);
+
+    return res;
+}
 
 
-template<typename T> 
-void Node<T>::clearValue()
-{ 
-	if ( m_value ) 
-		delete m_value;
+//frees all branch
+template<typename T>
+void Node<T>::freeBranch()
+{
+    if ( m_left ) {
+        m_left->freeBranch();
+        delete m_left;
+        m_left = nullptr;
+    }
+
+    if ( m_right ) {
+        m_right->freeBranch();
+        delete m_right;
+        m_right = nullptr;
+    }
+    clearNode();
 }
 
 template<typename T>
 ostream & operator<<( ostream &o, Node<T> &n) 
 {
-	o << "Node:" << *n << "\t" ;
+    ++ Node<T>::c;
+    for (int i=0; i < Node<T>::c; ++i )
+        o << "\t";
+
+    if (n.hasData())
+        o << "Data:" << n.data() << "\n";
+    if ( n.leftNode() )
+        o << *n.leftNode() ;
+    if ( n.rightNode() )
+        o <<*n.rightNode();
+    -- Node<T>::c;
 	return o;
 }
 
 template< typename T >
-Node<T> makeNode( Node<T> *parent, T &&val )
+Node<T> *makeNode( T &&val, Node<T> *parent = nullptr )
 {
-	T *ptr = new T(val);
-	auto node = Node<T>(parent, ptr);
-	return node;
+    Node<T> *node = new Node<T>(val);
+    return node;
 }
