@@ -9,12 +9,15 @@ template < typename T >
 class Node
 {
 public:
-    Node();
+    inline Node();
+
+	//! I'm not in the mood of writing the depth copy for this node.
     Node(Node<T> &) = delete;
 
     inline Node(const T &val, const Node<T> *parent = nullptr );
 
-    inline ~Node();
+    inline ~Node()
+	{ freeBranch(); }
 
     inline Node<T> *parent() const
     { return m_parent; }
@@ -38,8 +41,6 @@ public:
 
     void freeBranch();
 
-    static int c;
-
 private:
     void clearNode();
 
@@ -50,20 +51,13 @@ private:
     Node<T> * m_left  = nullptr;
     Node<T> * m_right = nullptr;
 };
-template<typename T>
-int Node<T>::c = 0;
+
 
 //Constructor: Intialiases node
 template<typename T> inline 
 Node<T>::Node( const T &val, const Node<T> *parent )
     : m_data(new T(val)), m_parent(parent)
 {}
-
-
-//Destructor
-template<typename T> inline 
-Node<T>::~Node()
-{ freeBranch(); }
 
 
 //cleans the inside of the node
@@ -119,23 +113,25 @@ void Node<T>::freeBranch()
 template<typename T>
 ostream & operator<<( ostream &o, Node<T> &n) 
 {
-    ++ Node<T>::c;
-    for (int i=0; i < Node<T>::c; ++i )
-        o << "\t";
-
-    if (n.hasData())
-        o << "Data:" << n.data() << "\n";
-    if ( n.leftNode() )
+   if ( n.leftNode() )
         o << *n.leftNode() ;
-    if ( n.rightNode() )
-        o <<*n.rightNode();
-    -- Node<T>::c;
+   if (n.hasData())
+        o << n.data() << ' ';
+   if ( n.rightNode() )
+       o <<*n.rightNode();
+
 	return o;
 }
 
 template< typename T >
-Node<T> *makeNode( T &&val, Node<T> *parent = nullptr )
+Node<T> &makeTree( T &&val, Node<T> *parent = nullptr )
 {
-    Node<T> *node = new Node<T>(val);
-    return node;
+    Node<T> *root = new Node<T>(val);
+    return *root;
+}
+	
+template< typename T >
+void removeTree( Node<T> &root )
+{ 
+	delete &root;
 }
