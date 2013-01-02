@@ -6,16 +6,18 @@ using std::cout;
 
 const int ChessBoardLen = 8;
 const int StartValue = 9;
+int g_Tried = 0;
+int g_Failed = 0;
 
 
 /*
  knight moves!
     8---1
       |
- 7	  |    2
+ 7    |    2
  |---------|
- 6	  |	   3
- 	  |
+ 6    |	   3
+      |
     5---4
 
 */
@@ -46,8 +48,6 @@ void print( int board[N][N] )
 	cout << "\n\n";
 }
 
-int g_Tried = 0;
-int g_Failed = 0;
 //checking if is x , y real?!
 template<int N>
 bool isMovable(const int &x, const int &y)
@@ -61,8 +61,8 @@ bool isMovable(const int &x, const int &y)
 
 
 static				//1  2   3  4  5   6  7  8	
-int Moves[2][8] = { { 1, 2,  2, 1, -1, -2, -2, -1}, //x
-				 	{-2, -1, 1, 2, 2,  1, -1, -2} };//y
+int Moves[2][8] = { { 1, 2, 2, 1, -1, -2, -2, -1}, //x
+                    {-2, -1, 1, 2, 2,  1, -1, -2} };//y
 
 
 
@@ -96,9 +96,10 @@ int findNextMove( int &x, int &y, const int board[N][N] )
 
 	move = lastMove(board[y][x]);
 	findPosByMove(x, y, move);
+	
+	// not cool! we gotta find something in that above loop
 
-	return 
-		(board[y][x] == StartValue) ? StartValue : findNextMove(x, y, board); // not cool! we gotta find something in that above loop
+	return (board[y][x] == StartValue) ? StartValue : findNextMove(x, y, board); 
 }
 
 
