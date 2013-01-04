@@ -3,11 +3,12 @@
 #include <assert.h>
 using std::endl;
 using std::cout;
+using std::cin;
 
-const int ChessBoardLen = 8;
+const unsigned int ChessBoardLen = 8;
 const int StartValue = 9;
-int g_Tried = 0;
-int g_Failed = 0;
+int g_Tried = -1;
+int g_Failed = -1;
 
 
 /*
@@ -34,15 +35,11 @@ int lastMove( const int &n )
 template<int N>
 void print( int board[N][N] )
 {
-	cout << "\t";
-	for(int i =0; i < N; ++i )
-		cout << i <<"  ";
-	cout << "\n\n";
+
 	for ( int i=0; i < N; ++i )
 	{
-		cout << i << ":\t";
 		for ( int j= 0; j < N; ++j )
-			cout << board[i][j] << "  ";
+			cout << board[i][j] << "\t";
 		cout << endl;
 	}
 	cout << "\n\n";
@@ -106,24 +103,34 @@ int findNextMove( int &x, int &y, const int board[N][N] )
 int main()
 {
 	int chess_board[ChessBoardLen][ChessBoardLen] = {0};
+	int board[ChessBoardLen][ChessBoardLen] = {0};
 
 	//start from
-	int x = 0, y = 0;
+	int x, y;
+
+	cout << "X and Y (Just Numbers with a space)?";
+	cin >> x >> y;
+	--y; --x;
+
+	if ( !isMovable<ChessBoardLen>(x, y) )
+	{
+		cout << "What kind of X/Y is this?!" << endl;
+		return 2;
+	}
 
 	chess_board[y][x] = StartValue;
-
 	int move = 0;
 	int i = 0;
 
 	do {
+		board[y][x] = i;
 		move = findNextMove(x, y, chess_board);
 		chess_board[y][x] = move;
 		++i;
 	} while ( chess_board[y][x] != StartValue );
 
-	print(chess_board);
+	print(board);
 
-	cout << "Filled  " << i << " squares." << endl;
 	printf("Tried %d and failed %d.\n" , g_Tried, g_Failed);
 	return 0;
 }
